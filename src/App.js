@@ -95,11 +95,24 @@ const App = () => {
     }
   };
 
+  const likeBlog = async ({id, newLikes}) => {
+    try {
+      blogService.update(id, {likes: newLikes});
+      const blogs = await blogService.getAll();
+      setBlogs(blogs);
+    } catch (e) {
+      setErrorNotification('Failed to add a like. Try logging in again.');
+      setTimeout(() => {
+        setErrorNotification(null);
+      }, 5000);
+    }
+  };
+
   const blogsList = () => (
     <div>
       {
         blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} />
+          <Blog key={blog.id} blog={blog} likeBlog={likeBlog} />
         )
       }
     </div>

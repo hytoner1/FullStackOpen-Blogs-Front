@@ -1,19 +1,20 @@
 import React, {useState, useEffect} from 'react';
 
 import Blog from './components/Blog';
+import LoginForm from './components/LoginForm';
+import Notifications from './components/Notification';
+import Togglable from './components/Togglable';
+import BlogForm from './components/BlogForm';
 
 import blogService from './services/blogs';
 import loginService from './services/login';
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
   const [user, setUser] = useState(null);
 
-  const [title, setTitle] = useState('');
-  const [author, setAuthor] = useState('');
-  const [url, setUrl] = useState('');
+  const [notification, setNotification] = useState(null);
+  const [errorNotification, setErrorNotification] = useState(null);
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -30,42 +31,31 @@ const App = () => {
     }
   }, []);
 
-  const handleLogin = async (event) => {
-    event.preventDefault();
+  const handleLogin = async (loginInfo) => {
 
     try {
-      const tmpUser = await loginService.login({
-        username, password
-      });
+      const tmpUser = await loginService.login(loginInfo);
 
       window.localStorage.setItem('loggedUser', JSON.stringify(tmpUser));
-
       blogService.setToken(tmpUser.token);
 
+      setNotification('Logged in user ' + tmpUser.username);
+      setTimeout(() => {
+        setNotification(null);
+      }, 5000);
+
       setUser(tmpUser);
-      setUsername('');
-      setPassword('');
     } catch (e) {
       console.log('Error: Wrong credentials');
+      setErrorNotification('Wrong username or password');
+      setTimeout(() => {
+        setErrorNotification(null);
+      }, 5000);
     }
   };
 
   const loginForm = () => (
-    <form onSubmit={handleLogin}>
-      <div>
-        username &nbsp;
-        <input type="text" value={username} name="Username"
-          onChange={({target}) => setUsername(target.value)}
-        />
-      </div>
-      <div>
-        password &nbsp;
-        <input type="password" value={password} name="Password"
-          onChange={({target}) => setPassword(target.value)}
-        />
-      </div>
-      <button type="submit">login</button>
-    </form>
+    <LoginForm handleLogin={handleLogin}/>
   );
 
   const logoutBlock = () => (
@@ -80,33 +70,27 @@ const App = () => {
     </div>
   );
 
-  const createNewBlock = () => (
-    <div>
-      <h2>Create New</h2>
-
-      Title: &nbsp;
-      <input type="text" value={title} name="Title"
-        onChange={({target}) => setTitle(target.value)}
-      />
-
-      <br />
-      Author: &nbsp;
-      <input type="text" value={author} name="Author"
-        onChange={({target}) => setAuthor(target.value)}
-      />
-
-      <br />
-      Url: &nbsp;
-      <input type="text" value={url} name="Url"
-        onChange={({target}) => setUrl(target.value)}
-      />
-
-      <br />
-      <button onClick={() => console.log('Creating new')}>
-        Create
-      </button>
-    </div>
+  const createBlogBlock = () => (
+    <Togglable buttonLabel='New Blog'>
+      <BlogForm createBlog={addBlog} />
+    </Togglable>
   );
+
+  const addBlog = (blogObj) => {
+    try {
+      blogService.create(blogObj);
+      setNotification(`Created Blog "${blogObj.title}" by ${blogObj.author}`);
+      setTimeout(() => {
+        setNotification(null);
+      }, 5000);
+      blogService.getAll().then(blogs => setBlogs(blogs));
+    } catch (e) {
+      setErrorNotification('Failed to create blog. Try logging in again.');
+      setTimeout(() => {
+        setErrorNotification(null);
+      }, 5000);
+    }
+  };
 
   const blogsList = () => (
     <div>
@@ -122,19 +106,22 @@ const App = () => {
     <div>
       <h2>BLOGS</h2>
 
+      <Notifications.Notification message={notification} />
+      <Notifications.ErrorNotification message={errorNotification} />
+
       {user === null
         ? null
         : logoutBlock()
       }
-      <hr/>
+
+      {user === null
+        ? null
+        : createBlogBlock()
+      }
+
       {user === null
         ? loginForm()
         : blogsList()
-      }
-      <hr />
-      {user === null
-        ? null
-        : createNewBlock()
       }
     </div>
   );

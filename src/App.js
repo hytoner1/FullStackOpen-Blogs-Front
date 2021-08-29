@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 
 import Blog from './components/Blog';
 import LoginForm from './components/LoginForm';
@@ -15,6 +15,8 @@ const App = () => {
 
   const [notification, setNotification] = useState(null);
   const [errorNotification, setErrorNotification] = useState(null);
+
+  const blogFormRef = useRef();
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -71,13 +73,14 @@ const App = () => {
   );
 
   const createBlogBlock = () => (
-    <Togglable buttonLabel='New Blog'>
+    <Togglable buttonLabel='New Blog' ref={blogFormRef}>
       <BlogForm createBlog={addBlog} />
     </Togglable>
   );
 
   const addBlog = (blogObj) => {
     try {
+      blogFormRef.current.toggleVisibility();
       blogService.create(blogObj);
       setNotification(`Created Blog "${blogObj.title}" by ${blogObj.author}`);
       setTimeout(() => {

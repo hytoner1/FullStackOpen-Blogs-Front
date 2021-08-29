@@ -11,10 +11,23 @@ const App = () => {
   const [password, setPassword] = useState('');
   const [user, setUser] = useState(null);
 
+  const [title, setTitle] = useState('');
+  const [author, setAuthor] = useState('');
+  const [url, setUrl] = useState('');
+
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs(blogs)
     );
+  }, []);
+
+  useEffect(() => {
+    const loggedUserJSON = window.localStorage.getItem('loggedUser');
+    if (loggedUserJSON) {
+      const tmpUser = JSON.parse(loggedUserJSON);
+      setUser(tmpUser);
+      blogService.setToken(tmpUser.token);
+    }
   }, []);
 
   const handleLogin = async (event) => {
@@ -24,6 +37,9 @@ const App = () => {
       const tmpUser = await loginService.login({
         username, password
       });
+
+      window.localStorage.setItem('loggedUser', JSON.stringify(tmpUser));
+
       blogService.setToken(tmpUser.token);
 
       setUser(tmpUser);
@@ -52,6 +68,46 @@ const App = () => {
     </form>
   );
 
+  const logoutBlock = () => (
+    <div>
+      User: {user.name} &nbsp;
+      <button onClick={() => {
+        setUser(null);
+        window.localStorage.removeItem('loggedUser');
+      }}>
+        Logout
+      </button>
+    </div>
+  );
+
+  const createNewBlock = () => (
+    <div>
+      <h2>Create New</h2>
+
+      Title: &nbsp;
+      <input type="text" value={title} name="Title"
+        onChange={({target}) => setTitle(target.value)}
+      />
+
+      <br />
+      Author: &nbsp;
+      <input type="text" value={author} name="Author"
+        onChange={({target}) => setAuthor(target.value)}
+      />
+
+      <br />
+      Url: &nbsp;
+      <input type="text" value={url} name="Url"
+        onChange={({target}) => setUrl(target.value)}
+      />
+
+      <br />
+      <button onClick={() => console.log('Creating new')}>
+        Create
+      </button>
+    </div>
+  );
+
   const blogsList = () => (
     <div>
       {
@@ -67,8 +123,18 @@ const App = () => {
       <h2>BLOGS</h2>
 
       {user === null
+        ? null
+        : logoutBlock()
+      }
+      <hr/>
+      {user === null
         ? loginForm()
         : blogsList()
+      }
+      <hr />
+      {user === null
+        ? null
+        : createNewBlock()
       }
     </div>
   );

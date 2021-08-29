@@ -14,6 +14,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "backend": "cd ../../Part4/FullStackOpen-Blogs/ && npm run dev",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

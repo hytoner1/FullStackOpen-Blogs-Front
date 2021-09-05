@@ -78,15 +78,16 @@ const App = () => {
     </Togglable>
   );
 
-  const addBlog = (blogObj) => {
+  const addBlog = async (blogObj) => {
     try {
       blogFormRef.current.toggleVisibility();
-      blogService.create(blogObj);
+      await blogService.create(blogObj);
       setNotification(`Created Blog "${blogObj.title}" by ${blogObj.author}`);
       setTimeout(() => {
         setNotification(null);
       }, 5000);
-      blogService.getAll().then(blogs => setBlogs(blogs));
+      const blogs = await blogService.getAll();
+      setBlogs(blogs);
     } catch (e) {
       setErrorNotification('Failed to create blog. Try logging in again.');
       setTimeout(() => {
@@ -108,12 +109,31 @@ const App = () => {
     }
   };
 
+  const removeBlog = async ({id, title, author}) => {
+    if (!window.confirm(`Do you want to remove ${title} by ${author}?`)) {
+      return;
+    }
+
+    try {
+      await blogService.remove(id);
+      const blogs = await blogService.getAll();
+      setBlogs(blogs);
+    } catch (e) {
+      setErrorNotification('Failed to remove blog with ID ' + id);
+      setTimeout(() => {
+        setErrorNotification(null);
+      }, 5000);
+    }
+  };
+
   const blogsList = () => (
     <div>
       {
-        blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} likeBlog={likeBlog} />
-        )
+        blogs
+          .sort((a, b) => b.likes - a.likes)
+          .map(blog =>
+            <Blog key={blog.id} blog={blog} likeBlog={likeBlog} removeBlog={removeBlog} />
+          )
       }
     </div>
   );

@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 
-const Blog = ({blog, likeBlog}) => {
+const Blog = ({blog, likeBlog, removeBlog}) => {
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -9,11 +9,23 @@ const Blog = ({blog, likeBlog}) => {
     marginBottom: 5
   };
 
+  const deleteBtnStyle = {
+    backgroundColor: 'red',
+    padding: 2,
+    margin: 2,
+    borderRadius: '4px'
+  };
+
   const [visible, setVisible] = useState(true);
 
   const handleLike = () => {
     event.preventDefault();
     likeBlog({id: blog.id, newLikes: blog.likes + 1});
+  };
+
+  const handleDelete = () => {
+    event.preventDefault();
+    removeBlog({id: blog.id, author: blog.author, name: blog.name});
   };
 
   return (
@@ -35,6 +47,11 @@ const Blog = ({blog, likeBlog}) => {
 
         <br />
         {blog.user.name}
+
+        <br />
+        <button style={deleteBtnStyle} onClick={() => handleDelete()}>
+          Remove
+        </button>
       </div>
 
       <div style={visible ? {display: 'none'} : blogStyle}>

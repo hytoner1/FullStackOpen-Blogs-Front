@@ -16,21 +16,21 @@ const Blog = ({blog, likeBlog, removeBlog}) => {
     borderRadius: '4px'
   };
 
-  const [visible, setVisible] = useState(true);
+  const [visible, setVisible] = useState(false);
 
   const handleLike = () => {
-    event.preventDefault();
+    //event.preventDefault();
     likeBlog({id: blog.id, newLikes: blog.likes + 1});
   };
 
   const handleDelete = () => {
-    event.preventDefault();
+    //event.preventDefault();
     removeBlog({id: blog.id, author: blog.author, name: blog.name});
   };
 
-  return (
-    <div>
-      <div style={visible ? blogStyle : {display: 'none'}}>
+  if (visible) {
+    return (
+      <div style={blogStyle} className='blogShown' id='blog'>
         {blog.title} - {blog.author} &nbsp;
         <button onClick={() => setVisible(false)}>
           Hide
@@ -41,7 +41,7 @@ const Blog = ({blog, likeBlog, removeBlog}) => {
 
         <br />
         Likes: {blog.likes} &nbsp;
-        <button onClick={() => handleLike()}>
+        <button onClick={handleLike} id='button_like'>
           Like
         </button>
 
@@ -49,21 +49,22 @@ const Blog = ({blog, likeBlog, removeBlog}) => {
         {blog.user.name}
 
         <br />
-        <button style={deleteBtnStyle} onClick={() => handleDelete()}>
+        <button style={deleteBtnStyle} onClick={handleDelete} id='button_remove'>
           Remove
         </button>
       </div>
-
-      <div style={visible ? {display: 'none'} : blogStyle}>
+    );
+  }
+  else {
+    return (
+      <div style={blogStyle} className='blogHidden' id='blog'>
         {blog.title} - {blog.author} &nbsp;
-        <button onClick={() => setVisible(true)}>
+        <button onClick={() => setVisible(true)} className='showButton' id='button_show'>
           Show
         </button>
       </div>
-    </div>
-
-  );
-
+    );
+  }
 };
 
 export default Blog;

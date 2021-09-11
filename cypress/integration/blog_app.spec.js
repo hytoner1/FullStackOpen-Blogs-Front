@@ -79,5 +79,56 @@ describe('Blog app', function () {
         cy.get('#blog').should('not.exist');
       });
     });
+
+    describe('and multiple blogs exist', function () {
+      beforeEach(function () {
+        cy.createBlog({
+          author: 'TestAuthor1',
+          title: 'TestTitle1',
+          url: 'TestUrl1'
+        });
+
+        cy.createBlog({
+          author: 'TestAuthor2',
+          title: 'TestTitle2',
+          url: 'TestUrl2'
+        });
+
+        cy.createBlog({
+          author: 'TestAuthor3',
+          title: 'TestTitle3',
+          url: 'TestUrl3'
+        });
+
+        cy.contains('TestTitle1').as('Blog1');
+        cy.get('@Blog1').contains('Show').click();
+        cy.get('@Blog1').contains('Like').as('Like1');
+
+        cy.contains('TestTitle2').as('Blog2');
+        cy.get('@Blog2').contains('Show').click();
+        cy.get('@Blog2').contains('Like').as('Like2');
+
+        cy.contains('TestTitle3').as('Blog3');
+        cy.get('@Blog3').contains('Show').click();
+        cy.get('@Blog3').contains('Like').as('Like3');
+      });
+
+      it('the blogs are ordered according to likes', function () {
+        // Like blogs [1,2,3] [2,1,0] times
+        cy.get('@Like2').click();
+        cy.wait(400);
+        cy.get('@Like2').click();
+        cy.wait(400);
+
+        cy.get('@Like3').click();
+        cy.wait(400);
+
+        cy.get('.blogShown').then(blogs => {
+          cy.wrap(blogs[0]).contains('Likes: 2');
+          cy.wrap(blogs[1]).contains('Likes: 1');
+          cy.wrap(blogs[2]).contains('Likes: 0');
+        });
+      });
+    });
   });
 });

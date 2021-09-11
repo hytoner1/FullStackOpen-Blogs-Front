@@ -7,3 +7,4 @@
 /.env
 /.eslintcache
 /cypress/videos
+/cypress/screenshots/blog_app.spec.js

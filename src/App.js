@@ -1,28 +1,26 @@
 import React, {useState, useEffect, useRef} from 'react';
-import {useDispatch} from 'react-redux';
+import {useSelector, useDispatch} from 'react-redux';
 
 import Blog from './components/Blog';
 import LoginForm from './components/LoginForm';
+import LogoutBlock from './components/LogoutBlock';
 import Notification from './components/Notification';
 import Togglable from './components/Togglable';
 import BlogForm from './components/BlogForm';
 
 import blogService from './services/blogs';
-import loginService from './services/login';
 
 import {setNotification} from './reducers/notificationReducer';
+import {setUser} from './reducers/userReducer';
 
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
-  const [user, setUser] = useState(null);
-
-  //const [notification, setNotification] = useState(null);
-  //const [errorNotification, setErrorNotification] = useState(null);
-
-  const blogFormRef = useRef();
+  const user = useSelector(state => state.user);
 
   const dispatch = useDispatch();
+
+  const blogFormRef = useRef();
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -34,39 +32,10 @@ const App = () => {
     const loggedUserJSON = window.localStorage.getItem('loggedUser');
     if (loggedUserJSON) {
       const tmpUser = JSON.parse(loggedUserJSON);
-      setUser(tmpUser);
+      dispatch(setUser(tmpUser));
       blogService.setToken(tmpUser.token);
     }
   }, []);
-
-  const handleLogin = async (loginInfo) => {
-    try {
-      const tmpUser = await loginService.login(loginInfo);
-      window.localStorage.setItem('loggedUser', JSON.stringify(tmpUser));
-      blogService.setToken(tmpUser.token);
-      dispatch(setNotification(`Logged in user ${tmpUser.username}`, false, 5));
-      setUser(tmpUser);
-    } catch (e) {
-      console.log('Error: Wrong credentials');
-      dispatch(setNotification('Wrong username or password', true, 5));
-    }
-  };
-
-  const loginForm = () => (
-    <LoginForm handleLogin={handleLogin}/>
-  );
-
-  const logoutBlock = () => (
-    <div>
-      User: {user.name} &nbsp;
-      <button onClick={() => {
-        setUser(null);
-        window.localStorage.removeItem('loggedUser');
-      }}>
-        Logout
-      </button>
-    </div>
-  );
 
   const createBlogBlock = () => (
     <Togglable buttonLabel='New Blog' ref={blogFormRef}>
@@ -78,17 +47,11 @@ const App = () => {
     try {
       blogFormRef.current.toggleVisibility();
       await blogService.create(blogObj);
-      setNotification(`Created Blog "${blogObj.title}" by ${blogObj.author}`);
-      setTimeout(() => {
-        setNotification(null);
-      }, 5000);
+      dispatch(setNotification(`Created Blog "${blogObj.title}" by ${blogObj.author}`));
       const blogs = await blogService.getAll();
       setBlogs(blogs);
     } catch (e) {
-      //setErrorNotification('Failed to create blog. Try logging in again.');
-      //setTimeout(() => {
-      //  setErrorNotification(null);
-      //}, 5000);
+      dispatch(setNotification('Failed to create blog. Try logging in again.', true));
     }
   };
 
@@ -98,10 +61,7 @@ const App = () => {
       const blogs = await blogService.getAll();
       setBlogs(blogs);
     } catch (e) {
-      //setErrorNotification('Failed to add a like. Try logging in again.');
-      //setTimeout(() => {
-      //  setErrorNotification(null);
-      //}, 5000);
+      dispatch(setNotification('Failed to add a like. Try logging in again.', true, 5));
     }
   };
 
@@ -115,10 +75,7 @@ const App = () => {
       const blogs = await blogService.getAll();
       setBlogs(blogs);
     } catch (e) {
-      //setErrorNotification('Failed to remove blog with ID ' + id);
-      //setTimeout(() => {
-      //  setErrorNotification(null);
-      //}, 5000);
+      dispatch(setNotification(`Failed to remove blog with ID ${id}`, true, 5));
     }
   };
 
@@ -139,11 +96,7 @@ const App = () => {
       <h2>BLOGS</h2>
 
       <Notification />
-
-      {user === null
-        ? null
-        : logoutBlock()
-      }
+      <LogoutBlock />
 
       {user === null
         ? null
@@ -151,7 +104,7 @@ const App = () => {
       }
 
       {user === null
-        ? loginForm()
+        ? <LoginForm/>
         : blogsList()
       }
     </div>

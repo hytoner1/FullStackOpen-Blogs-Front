@@ -1,15 +1,31 @@
 import React, {useState} from 'react';
-import PropTypes from 'prop-types';
+import {useDispatch} from 'react-redux';
 
-const LoginForm = ({handleLogin}) => {
-  LoginForm.propTypes = {handleLogin: PropTypes.func.isRequired};
+import blogService from '../services/blogs';
+import loginService from '../services/login';
+
+import {setNotification} from '../reducers/notificationReducer';
+import {setUser} from '../reducers/userReducer';
+
+const LoginForm = () => {
+  const dispatch = useDispatch();
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const login = (event) => {
+  const login = async (event) => {
     event.preventDefault();
-    handleLogin({username, password});
+    try {
+      const tmpUser = await loginService.login({username, password});
+      window.localStorage.setItem('loggedUser', JSON.stringify(tmpUser));
+      blogService.setToken(tmpUser.token);
+
+      dispatch(setNotification(`Logged in user ${tmpUser.username}`));
+      dispatch(setUser(tmpUser));
+    } catch (e) {
+      console.log('Error: Wrong credentials');
+      dispatch(setNotification('Wrong username or password', true));
+    }
   };
 
   return (

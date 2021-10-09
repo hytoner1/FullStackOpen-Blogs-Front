@@ -17,7 +17,7 @@ const notificationReducer = (state = {text: 'Welcome', isError: false, timeout: 
   }
 };
 
-export const setNotification = (text, isError = false, timeout) => {
+export const setNotification = (text, isError = false, timeout = 5) => {
   console.log('setNotification:', text, isError, timeout);
   return async dispatch => {
     clearTimeout(idTime);

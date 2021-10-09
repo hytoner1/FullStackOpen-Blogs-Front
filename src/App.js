@@ -1,22 +1,28 @@
 import React, {useState, useEffect, useRef} from 'react';
+import {useDispatch} from 'react-redux';
 
 import Blog from './components/Blog';
 import LoginForm from './components/LoginForm';
-import Notifications from './components/Notification';
+import Notification from './components/Notification';
 import Togglable from './components/Togglable';
 import BlogForm from './components/BlogForm';
 
 import blogService from './services/blogs';
 import loginService from './services/login';
 
+import {setNotification} from './reducers/notificationReducer';
+
+
 const App = () => {
   const [blogs, setBlogs] = useState([]);
   const [user, setUser] = useState(null);
 
-  const [notification, setNotification] = useState(null);
-  const [errorNotification, setErrorNotification] = useState(null);
+  //const [notification, setNotification] = useState(null);
+  //const [errorNotification, setErrorNotification] = useState(null);
 
   const blogFormRef = useRef();
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -34,25 +40,15 @@ const App = () => {
   }, []);
 
   const handleLogin = async (loginInfo) => {
-
     try {
       const tmpUser = await loginService.login(loginInfo);
-
       window.localStorage.setItem('loggedUser', JSON.stringify(tmpUser));
       blogService.setToken(tmpUser.token);
-
-      setNotification('Logged in user ' + tmpUser.username);
-      setTimeout(() => {
-        setNotification(null);
-      }, 5000);
-
+      dispatch(setNotification(`Logged in user ${tmpUser.username}`, false, 5));
       setUser(tmpUser);
     } catch (e) {
       console.log('Error: Wrong credentials');
-      setErrorNotification('Wrong username or password');
-      setTimeout(() => {
-        setErrorNotification(null);
-      }, 5000);
+      dispatch(setNotification('Wrong username or password', true, 5));
     }
   };
 
@@ -89,10 +85,10 @@ const App = () => {
       const blogs = await blogService.getAll();
       setBlogs(blogs);
     } catch (e) {
-      setErrorNotification('Failed to create blog. Try logging in again.');
-      setTimeout(() => {
-        setErrorNotification(null);
-      }, 5000);
+      //setErrorNotification('Failed to create blog. Try logging in again.');
+      //setTimeout(() => {
+      //  setErrorNotification(null);
+      //}, 5000);
     }
   };
 
@@ -102,10 +98,10 @@ const App = () => {
       const blogs = await blogService.getAll();
       setBlogs(blogs);
     } catch (e) {
-      setErrorNotification('Failed to add a like. Try logging in again.');
-      setTimeout(() => {
-        setErrorNotification(null);
-      }, 5000);
+      //setErrorNotification('Failed to add a like. Try logging in again.');
+      //setTimeout(() => {
+      //  setErrorNotification(null);
+      //}, 5000);
     }
   };
 
@@ -119,10 +115,10 @@ const App = () => {
       const blogs = await blogService.getAll();
       setBlogs(blogs);
     } catch (e) {
-      setErrorNotification('Failed to remove blog with ID ' + id);
-      setTimeout(() => {
-        setErrorNotification(null);
-      }, 5000);
+      //setErrorNotification('Failed to remove blog with ID ' + id);
+      //setTimeout(() => {
+      //  setErrorNotification(null);
+      //}, 5000);
     }
   };
 
@@ -142,8 +138,7 @@ const App = () => {
     <div>
       <h2>BLOGS</h2>
 
-      <Notifications.Notification message={notification} />
-      <Notifications.ErrorNotification message={errorNotification} />
+      <Notification />
 
       {user === null
         ? null

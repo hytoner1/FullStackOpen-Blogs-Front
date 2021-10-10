@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
 import blogService from '../services/blogs';
 import loginService from '../services/login';
@@ -8,6 +8,8 @@ import {setNotification} from '../reducers/notificationReducer';
 import {setUser} from '../reducers/userReducer';
 
 const LoginForm = () => {
+  const user = useSelector(state => state.user);
+
   const dispatch = useDispatch();
 
   const [username, setUsername] = useState('');
@@ -28,6 +30,10 @@ const LoginForm = () => {
     }
   };
 
+  if (user) {
+    return null;
+  }
+
   return (
     <form onSubmit={login} id='form_login'>
       <div>
@@ -46,4 +52,5 @@ const LoginForm = () => {
     </form>
   );
 };
+
 export default LoginForm;

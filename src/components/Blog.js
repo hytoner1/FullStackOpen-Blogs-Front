@@ -1,6 +1,14 @@
 import React, {useState} from 'react';
+import {useDispatch} from 'react-redux';
 
-const Blog = ({blog, likeBlog, removeBlog}) => {
+import {setNotification} from '../reducers/notificationReducer';
+import {likeBlog, removeBlog} from '../reducers/blogsReducer';
+
+import blogService from '../services/blogs';
+
+const Blog = ({blog}) => {
+  const dispatch = useDispatch();
+
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -18,14 +26,28 @@ const Blog = ({blog, likeBlog, removeBlog}) => {
 
   const [visible, setVisible] = useState(false);
 
-  const handleLike = () => {
-    //event.preventDefault();
-    likeBlog({id: blog.id, newLikes: blog.likes + 1});
+  const handleLike = async () => {
+    try {
+      await blogService.update(blog.id, {likes: blog.likes + 1});
+      dispatch(likeBlog(blog.id));
+    } catch (e) {
+      console.log(e);
+      dispatch(setNotification('Failed to add a like. Try logging in again.', true));
+    }
   };
 
-  const handleDelete = () => {
-    //event.preventDefault();
-    removeBlog({id: blog.id, author: blog.author, name: blog.name});
+  const handleDelete = async () => {
+    if (!window.confirm(`Do you want to remove ${blog.title} by ${blog.author}?`)) {
+      return;
+    }
+
+    try {
+      await blogService.remove(blog.id);
+      dispatch(removeBlog(blog.id));
+    } catch (e) {
+      console.log(e);
+      dispatch(setNotification(`Failed to remove blog with ID ${blog.id}`, true));
+    }
   };
 
   if (visible) {

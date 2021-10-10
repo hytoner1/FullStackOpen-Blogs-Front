@@ -1,7 +1,6 @@
 import React, {useEffect} from 'react';
 import {useDispatch} from 'react-redux';
 
-//import Blog from './components/Blog';
 import LoginForm from './components/LoginForm';
 import LogoutBlock from './components/LogoutBlock';
 import Notification from './components/Notification';
@@ -16,7 +15,6 @@ import {initializeBlogs} from './reducers/blogsReducer';
 
 const App = () => {
   const dispatch = useDispatch();
-
 
   useEffect(() => {
     blogService.getAll().then(blogs =>

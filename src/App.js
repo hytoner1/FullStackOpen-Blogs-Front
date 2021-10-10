@@ -4,8 +4,8 @@ import {
   Switch, Route, useRouteMatch/*, Link, useParams, useHistory*/
 } from 'react-router-dom';
 
+import Header from './components/Header';
 import LoginForm from './components/LoginForm';
-import LogoutBlock from './components/LogoutBlock';
 import Notification from './components/Notification';
 import Blog from './components/Blog';
 import BlogForm from './components/BlogForm';
@@ -49,11 +49,12 @@ const App = () => {
 
   return (
     <div className="container">
-      <h2>BLOGS</h2>
+      <Header />
+
+      <h2 style={{paddingTop: '20px', paddingBottom: '10px'}}>BLOGS APP</h2>
 
       <Notification />
       <LoginForm />
-      <LogoutBlock />
 
       <Switch>
         <Route path='/users'>

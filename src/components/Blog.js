@@ -1,6 +1,10 @@
 import React, {useState} from 'react';
 import {useDispatch} from 'react-redux';
 
+import {
+  Link
+} from 'react-router-dom';
+
 import {setNotification} from '../reducers/notificationReducer';
 import {likeBlog, removeBlog} from '../reducers/blogsReducer';
 
@@ -58,12 +62,9 @@ const Blog = ({blog, showByDefault=false}) => {
     return (
       <div style={blogStyle} className='blogShown' id='blog'>
         {blog.title} - {blog.author} &nbsp;
-        <button onClick={() => setVisible(false)}>
-          Hide
-        </button>
 
         <br />
-        {blog.url}
+        <Link to={blog.url}>{blog.url}</Link>
 
         <br />
         Likes: {blog.likes} &nbsp;

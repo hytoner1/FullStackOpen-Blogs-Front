@@ -1,7 +1,11 @@
 import React from 'react';
 import {useSelector} from 'react-redux';
 
-import Blog from './Blog';
+import {
+  Link
+} from 'react-router-dom';
+
+import {Table} from 'react-bootstrap';
 
 const BlogList = () => {
   const blogs = useSelector(state => state.blogs);
@@ -13,13 +17,33 @@ const BlogList = () => {
 
   return (
     <div>
-      {
-        blogs
-          .sort((a, b) => b.likes - a.likes)
-          .map(blog =>
-            <Blog key={blog.id} blog={blog} />
-          )
-      }
+      <Table striped>
+        <tbody>
+          <tr>
+            <th>
+              Title
+            </th>
+            <th>
+              By
+            </th>
+          </tr>
+
+          {blogs
+            .sort((a, b) => b.likes - a.likes)
+            .map(b =>
+              <tr key={b.id}>
+                <td>
+                  <Link to={`/blogs/${b.id}`}>
+                    {b.title}
+                  </Link>
+                </td>
+                <td>
+                  {b.author}
+                </td>
+              </tr>
+            )}
+        </tbody>
+      </Table>
     </div>
   );
 };

@@ -1,9 +1,7 @@
 const userReducer = (state = null, action) => {
-
   switch (action.type) {
   case 'SET_USER':
   {
-    console.log(action.user);
     return action.user;
   }
   case 'CLEAR_USER':

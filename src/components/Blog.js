@@ -6,7 +6,7 @@ import {likeBlog, removeBlog} from '../reducers/blogsReducer';
 
 import blogService from '../services/blogs';
 
-const Blog = ({blog}) => {
+const Blog = ({blog, showByDefault=false}) => {
   const dispatch = useDispatch();
 
   const blogStyle = {
@@ -24,7 +24,7 @@ const Blog = ({blog}) => {
     borderRadius: '4px'
   };
 
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(showByDefault);
 
   const handleLike = async () => {
     try {
@@ -50,6 +50,10 @@ const Blog = ({blog}) => {
     }
   };
 
+  if (!blog) {
+    return null;
+  }
+
   if (visible) {
     return (
       <div style={blogStyle} className='blogShown' id='blog'>
@@ -68,7 +72,7 @@ const Blog = ({blog}) => {
         </button>
 
         <br />
-        {blog.user.name}
+        Added by {blog.user.name}
 
         <br />
         <button style={deleteBtnStyle} onClick={handleDelete} id='button_remove'>

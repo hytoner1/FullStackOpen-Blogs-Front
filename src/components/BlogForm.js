@@ -31,6 +31,7 @@ const BlogForm = () => {
       dispatch(setNotification(`Created Blog "${title}" by ${author}`));
       blogFormRef.current.toggleVisibility();
     } catch (e) {
+      console.log(e);
       dispatch(setNotification('Failed to create blog. Try logging in again.', true));
     }
     clearFields();
@@ -45,25 +46,47 @@ const BlogForm = () => {
       <h2>Create New</h2>
 
       <form onSubmit={addBlog}>
-        Title: &nbsp;
-        <input type="text" value={title} id="Title"
-          onChange={({target}) => setTitle(target.value)}
-        />
+        <table>
+          <tr>
+            <td>
+              Title: &nbsp;
+            </td>
+            <td>
+              <input type="text" value={title} id="Title"
+                onChange={({target}) => setTitle(target.value)}
+              />
+            </td>
+            <br />
+          </tr>
+          <tr>
+            <td>
+              Author: &nbsp;
+            </td>
+            <td>
+              <input type="text" value={author} id="Author"
+                onChange={({target}) => setAuthor(target.value)}
+              />
+              <br />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Url: &nbsp;
+            </td>
+            <td>
+              <input type="text" value={url} id="Url"
+                onChange={({target}) => setUrl(target.value)}
+              />
+            </td>
+            <br />
+          </tr>
 
-        <br />
-        Author: &nbsp;
-        <input type="text" value={author} id="Author"
-          onChange={({target}) => setAuthor(target.value)}
-        />
-
-        <br />
-          Url: &nbsp;
-        <input type="text" value={url} id="Url"
-          onChange={({target}) => setUrl(target.value)}
-        />
-
-        <br />
-        <button type='submit'>Save</button>
+          <tr>
+            <td>
+              <button type='submit'>Save</button>
+            </td>
+          </tr>
+        </table>
       </form>
     </Togglable>
   );

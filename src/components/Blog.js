@@ -1,16 +1,24 @@
-import React, {useState} from 'react';
-import {useDispatch} from 'react-redux';
+import React from 'react';
+import {useDispatch, useSelector} from 'react-redux';
 
 import {
   Link
 } from 'react-router-dom';
+
+import CommentForm from './CommentForm';
 
 import {setNotification} from '../reducers/notificationReducer';
 import {likeBlog, removeBlog} from '../reducers/blogsReducer';
 
 import blogService from '../services/blogs';
 
-const Blog = ({blog, showByDefault=false}) => {
+import {Table} from 'react-bootstrap';
+
+const Blog = ({blogId}) => {
+  const user = useSelector(state => state.user);
+  const blogs = useSelector(state => state.blogs);
+  const blog = blogs.find(b => b.id === blogId);
+
   const dispatch = useDispatch();
 
   const blogStyle = {
@@ -27,8 +35,6 @@ const Blog = ({blog, showByDefault=false}) => {
     margin: 2,
     borderRadius: '4px'
   };
-
-  const [visible, setVisible] = useState(showByDefault);
 
   const handleLike = async () => {
     try {
@@ -54,44 +60,51 @@ const Blog = ({blog, showByDefault=false}) => {
     }
   };
 
-  if (!blog) {
+  if (!blog || !user) {
     return null;
   }
 
-  if (visible) {
-    return (
-      <div style={blogStyle} className='blogShown' id='blog'>
-        {blog.title} - {blog.author} &nbsp;
+  return (
+    <div style={blogStyle} className='blogShown' id='blog'>
+      <h3>{blog.title} - {blog.author} &nbsp;</h3>
 
-        <br />
-        <Link to={blog.url}>{blog.url}</Link>
+      <Link to={blog.url}>{blog.url}</Link>
+      <br />
 
-        <br />
-        Likes: {blog.likes} &nbsp;
-        <button onClick={handleLike} id='button_like'>
-          Like
-        </button>
+      Added by {blog.user.name}
+      <br />
+      <br />
 
-        <br />
-        Added by {blog.user.name}
+      Likes: {blog.likes} &nbsp;
+      <button onClick={handleLike} id='button_like'>
+        Like
+      </button>
+      <br />
+      <br />
 
-        <br />
-        <button style={deleteBtnStyle} onClick={handleDelete} id='button_remove'>
-          Remove
-        </button>
-      </div>
-    );
-  }
-  else {
-    return (
-      <div style={blogStyle} className='blogHidden' id='blog'>
-        {blog.title} - {blog.author} &nbsp;
-        <button onClick={() => setVisible(true)} className='showButton' id='button_show'>
-          Show
-        </button>
-      </div>
-    );
-  }
+      <b>Comments</b>
+
+      <CommentForm id={blog.id}/>
+
+      <Table striped>
+        <tbody>
+          {blog.comments
+            .map(c =>
+              <tr key={c.id}>
+                <td>
+                  {c.text}
+                </td>
+              </tr>
+            )}
+        </tbody>
+      </Table>
+      <br />
+
+      <button style={deleteBtnStyle} onClick={handleDelete} id='button_remove'>
+        Remove
+      </button>
+    </div>
+  );
 };
 
 export default Blog;

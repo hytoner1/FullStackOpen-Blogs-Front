@@ -21,6 +21,15 @@ const blogsReducer = (state = [], action) => {
     console.log('Remove,', id);
     return state.filter(b => b.id !== id);
   }
+  case 'COMMENT_BLOG':
+  {
+    const id = action.data.blog;
+    const text = action.data.text;
+    const blogToChange = state.find(b => b.id === id);
+    const newComments = [...blogToChange.comments, {text: text, id: action.data.id}];
+    const changedBlog = {...blogToChange, comments: newComments};
+    return state.map(b => b.id === id ? changedBlog : b);
+  }
   default:
   {
     return state;
@@ -53,6 +62,13 @@ export const removeBlog = (id) => {
   return {
     type: 'REMOVE_BLOG',
     data: id
+  };
+};
+
+export const commentBlog = (data) => {
+  return {
+    type: 'COMMENT_BLOG',
+    data
   };
 };
 

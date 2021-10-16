@@ -22,7 +22,7 @@ import {initializeUsers} from './reducers/usersReducer';
 
 
 const App = () => {
-  const blogs = useSelector(state => state.blogs);
+  //const blogs = useSelector(state => state.blogs);
   const users = useSelector(state => state.users);
 
   const dispatch = useDispatch();
@@ -45,9 +45,9 @@ const App = () => {
   }, []);
 
   const blogMatch = useRouteMatch('/blogs/:id');
-  const selectedBlog = blogMatch
-    ? blogs.find(b => b.id === blogMatch.params.id)
-    : null;
+  //const selectedBlog = blogMatch
+  //  ? blogs.find(b => b.id === blogMatch.params.id)
+  //  : null;
 
   const userMatch = useRouteMatch('/users/:id');
   const selectedUser = userMatch
@@ -65,7 +65,7 @@ const App = () => {
 
       <Switch>
         <Route path='/blogs/:id'>
-          <Blog blog={selectedBlog} showByDefault={true}/>
+          <Blog blogId={blogMatch ? blogMatch.params.id : null} showByDefault={true}/>
         </Route>
 
         <Route path='/users/:id'>

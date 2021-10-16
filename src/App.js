@@ -11,6 +11,7 @@ import Blog from './components/Blog';
 import BlogForm from './components/BlogForm';
 import BlogList from './components/BlogList';
 import UserList from './components/UserList';
+import User from './components/User';
 
 import blogService from './services/blogs';
 import usersService from './services/users';
@@ -22,6 +23,7 @@ import {initializeUsers} from './reducers/usersReducer';
 
 const App = () => {
   const blogs = useSelector(state => state.blogs);
+  const users = useSelector(state => state.users);
 
   const dispatch = useDispatch();
 
@@ -42,9 +44,14 @@ const App = () => {
     }
   }, []);
 
-  const match = useRouteMatch('/blogs/:id');
-  const blog = match
-    ? blogs.find(b => b.id === match.params.id)
+  const blogMatch = useRouteMatch('/blogs/:id');
+  const selectedBlog = blogMatch
+    ? blogs.find(b => b.id === blogMatch.params.id)
+    : null;
+
+  const userMatch = useRouteMatch('/users/:id');
+  const selectedUser = userMatch
+    ? users.find(u => u.id === userMatch.params.id)
     : null;
 
   return (
@@ -57,12 +64,16 @@ const App = () => {
       <LoginForm />
 
       <Switch>
-        <Route path='/users'>
-          <UserList />
+        <Route path='/blogs/:id'>
+          <Blog blog={selectedBlog} showByDefault={true}/>
         </Route>
 
-        <Route path='/blogs/:id'>
-          <Blog blog={blog} showByDefault={true}/>
+        <Route path='/users/:id'>
+          <User user={selectedUser} />
+        </Route>
+
+        <Route path='/users'>
+          <UserList />
         </Route>
 
         <Route path='/'>

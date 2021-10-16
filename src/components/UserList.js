@@ -1,11 +1,15 @@
 import React from 'react';
 import {useSelector} from 'react-redux';
+
+import {
+  Link
+} from 'react-router-dom';
+
 import {Table} from 'react-bootstrap';
 
 const UserList = () => {
   const users = useSelector(state => state.users);
   const user = useSelector(state => state.user);
-  //const dispatch = useDispatch();
 
   if (!user) {
     return null;
@@ -29,7 +33,9 @@ const UserList = () => {
           {users.map(u =>
             <tr key={u.id}>
               <td>
-                {u.name}
+                <Link to={`/users/${u.id}`}>
+                  {u.name}
+                </Link>
               </td>
               <td>
                 {u.blogs.length}
